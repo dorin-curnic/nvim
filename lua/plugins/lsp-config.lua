@@ -29,9 +29,9 @@ return {
 		"neovim/nvim-lspconfig",
 		config = function()
 			local lspconfig = require("lspconfig")
-			local on_attach = function(client, bufnr)
-				-- your on_attach here (keymaps, etc)
-			end
+      local keymaps = require("config.keymaps")
+
+			local on_attach = keymaps.lsp_on_attach
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 
 			local servers = {
@@ -53,12 +53,6 @@ return {
 					capabilities = capabilities,
 				})
 			end
-			-- Keymaps
-			vim.keymap.set("n", "<leader>h", vim.lsp.buf.hover, {})
-			vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, {})
-			vim.keymap.set("n", "<leader>c", vim.lsp.buf.code_action, {})
-			-- show the diagnostics (errors/warnings) under the cursor
-			vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, bufopts)
 		end,
 	},
 }
