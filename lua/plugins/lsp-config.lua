@@ -13,14 +13,14 @@ return {
       -- install these servers
       ensure_installed = {
         "pyright", -- Python
-        "clangd", -- C / C++
-        "ts_ls", -- JavaScript & TypeScript
-        "sqlls", -- SQL
-        "jdtls", -- Java
-        "lua_ls", -- Lua
-        "html", -- HTML
-        "cssls", -- CSS
-        "bzl", -- Bazel / Starlark LSP
+        "clangd",  -- C / C++
+        "ts_ls",   -- JavaScript & TypeScript
+        "sqlls",   -- SQL
+        "jdtls",   -- Java
+        "lua_ls",  -- Lua
+        "html",    -- HTML
+        "cssls",   -- CSS
+        "bzl",     -- Bazel / Starlark LSP
       },
       automatic_installation = true,
     },
@@ -32,18 +32,18 @@ return {
       local keymaps = require("config.keymaps")
 
       local on_attach = keymaps.lsp_on_attach
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       local servers = {
         "pyright", -- Python
-        "clangd", -- C / C++
-        "ts_ls", -- JavaScript & TypeScript
-        "sqlls", -- SQL
-        "jdtls", -- Java
-        "lua_ls", -- Lua
-        "html", -- HTML
-        "cssls", -- CSS
-        "bzl", -- Bazel/Starlark
+        "clangd",  -- C / C++
+        "ts_ls",   -- JavaScript & TypeScript
+        "sqlls",   -- SQL
+        "jdtls",   -- Java
+        "lua_ls",  -- Lua
+        "html",    -- HTML
+        "cssls",   -- CSS
+        "bzl",     -- Bazel/Starlark
       }
 
       -- Configure Mason-managed servers.
@@ -57,15 +57,15 @@ return {
       -- Swift / Xcode projects.
       -- This is NOT installed by Mason. It comes from Xcode.
       lspconfig.sourcekit.setup({
-	      on_attach = on_attach,
-	      capabilities = capabilities,
-	      cmd = { "xcrun", "--toolchain", "default", "sourcekit-lsp" },
-	      filetypes = { "swift" },
-	      root_dir = function(fname)
-		      return lspconfig.util.root_pattern("buildServer.json")(fname)
-			      or lspconfig.util.root_pattern("*.xcodeproj", "*.xcworkspace", "Package.swift", ".git")(fname)
-    	end,
-    })
+        on_attach = on_attach,
+        capabilities = capabilities,
+        cmd = { "xcrun", "--toolchain", "default", "sourcekit-lsp" },
+        filetypes = { "swift" },
+        root_dir = function(fname)
+          return lspconfig.util.root_pattern("buildServer.json")(fname)
+              or lspconfig.util.root_pattern("*.xcodeproj", "*.xcworkspace", "Package.swift", ".git")(fname)
+        end,
+      })
     end,
   },
 }
