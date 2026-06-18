@@ -18,10 +18,13 @@ function M.setup()
 
   -- Save
   map({ "n", "i", "v", "x" }, "<C-s>", "<cmd>update<cr>", "Save")
+
   if is_mac then
     map({ "n", "i", "v", "x" }, "<D-s>", function()
       vim.cmd("update")
-      pcall(function() vim.lsp.buf.format({ async = true }) end)
+      pcall(function()
+        vim.lsp.buf.format({ async = true })
+      end)
     end, "Save + Format")
   end
 
@@ -31,8 +34,8 @@ function M.setup()
 
   -- Buffers
   map("n", "<leader>bd", "<cmd>bdelete<cr>", "Delete buffer")
-  map("n", "<S-l>", "<cmd>bnext<cr>",  "Next buffer")
-  map("n", "<S-h>", "<cmd>bprevious<cr>", "Prev buffer")
+  map("n", "<leader>bn", "<cmd>bnext<cr>",  "Next buffer")
+  map("n", "<leader>bp", "<cmd>bprevious<cr>", "Prev buffer")
 
   -- Windows / splits
   map("n", "<leader>sv", "<C-w>v", "Split vertical")
@@ -49,49 +52,40 @@ function M.setup()
   map("v", "<A-k>", ":m '<-2<CR>gv=gv", "Move selection up")
 
   -- Clear search highlights fast
-  map({ "n", "i" }, "<Esc>", function()
-    vim.cmd.nohlsearch()
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
-  end, "Clear search highlight")
+  map("n", "<Esc>", "<cmd>nohlsearch<cr>", "Clear search highlight")
 
   -- Terminal mode: quick exit
   map("t", "<Esc>", "<C-\\><C-n>", "Exit Terminal mode")
+
+  -- Indent/outdent and keep selection in Visual mode
+  map("v", "<", "<gv", "Outdent and keep selection")
+  map("v", ">", ">gv", "Indent and keep selection")
 
   -- =========
   -- Plugins
   -- =========
 
-  -- Neo-tree (right side)
+  -- Neo-tree
   map("n", "<leader>e", "<cmd>Neotree toggle position=right<cr>", "Toggle Explorer")
   map("n", "<leader>E", "<cmd>Neotree reveal position=right<cr>", "Reveal current file")
-  if is_mac then
-    map("n", "<D-b>", "<cmd>Neotree toggle position=right<cr>", "Toggle Explorer (⌘B)")
-  end
 
   -- Telescope
   map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", "Find files")
   map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", "Live grep")
   map("n", "<leader>fb", "<cmd>Telescope buffers<cr>", "Buffers")
   map("n", "<leader>fh", "<cmd>Telescope help_tags<cr>", "Help tags")
-  if is_mac then
-    map("n", "<D-p>", "<cmd>Telescope find_files<cr>", "Find files (⌘P)")
-    map("n", "<D-f>", "<cmd>Telescope live_grep<cr>", "Live grep (⌘F)")
-  end
+  map("n", "<leader>fk", "<cmd>Telescope keymaps<cr>", "Find keymaps")
 
-  -- Comment.nvim (remap to built-in gc/gcc so plugin handles logic)
+  -- Comment.nvim
   map("n", "<leader>/", "gcc", "Toggle comment line", { remap = true })
   map("v", "<leader>/", "gc",  "Toggle comment selection", { remap = true })
-  if is_mac then
-    map("n", "<D-/>", "gcc", "Toggle comment line (⌘/)", { remap = true })
-    map("v", "<D-/>", "gc",  "Toggle comment selection (⌘/)", { remap = true })
-  end
 
   -- Lazy UI
   map("n", "<leader>lz", "<cmd>Lazy<cr>", "Open Lazy")
 end
 
 -- =========
--- LSP on_attach (buffer-local maps)
+-- LSP on_attach
 -- =========
 function M.lsp_on_attach(_, bufnr)
   local function bmap(mode, lhs, rhs, desc, opts)
@@ -114,17 +108,23 @@ function M.lsp_on_attach(_, bufnr)
   -- References via Telescope if available, else fallback
   bmap("n", "gr", function()
     local ok, tb = pcall(require, "telescope.builtin")
-    if ok then tb.lsp_references({ include_declaration = false }) else vim.lsp.buf.references() end
+
+    if ok then
+      tb.lsp_references({ include_declaration = false })
+    else
+      vim.lsp.buf.references()
+    end
   end, "References")
 
   -- Formatting
-  bmap({ "n", "x" }, "<leader>f", function() vim.lsp.buf.format({ async = true }) end, "Format")
+  bmap({ "n", "x" }, "<leader>f", function()
+    vim.lsp.buf.format({ async = true })
+  end, "Format")
 
   -- Diagnostics
-  bmap("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
-  bmap("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
   bmap("n", "<leader>de", vim.diagnostic.open_float, "Line diagnostics")
-  bmap("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics → loclist")
+  bmap("n", "<leader>dl", vim.diagnostic.setloclist, "Diagnostics to loclist")
 end
 
 return M
+
